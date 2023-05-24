@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      /* CSS styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #b6deb8;
+      }
+
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      button {
+        background-color: #185c7a;
+
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #4caf50;
+      }
+
+      .loading-container {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .response-container {
+        display: none;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Trading Bot</h2>
+      <label for="tokenAddress">Token Address:</label>
+      <input type="text" id="tokenAddress" placeholder="Token Address" />
+
+      <label for="targetPrice">Target Price:</label>
+      <input type="number" id="targetPrice" placeholder="Target Price" />
+
+      <label for="respectedToken">Respected Token:</label>
+      <input type="text" id="respectedToken" placeholder="Respected Token" />
+
+      <label for="pairAddress">Pair Address:</label>
+      <input type="text" id="pairAddress" placeholder="Pair Address" />
+
+      <button onclick="callAPI()">Submit</button>
+
+      <div class="loading-container" id="loadingContainer">
+        <div class="loading"></div>
+        <p>Loading...</p>
+      </div>
+
+      <div class="response-container" id="responseContainer">
+        <h3>Current Price:</h3>
+        <p id="responseValue"></p>
+      </div>
+    </div>
+
+    <script>
+      function callAPI() {
+        const tokenAddress = document.getElementById("tokenAddress").value;
+        const targetPrice = document.getElementById("targetPrice").value;
+        const respectedToken = document.getElementById("respectedToken").value;
+        const pairAddress = document.getElementById("pairAddress").value;
+
+        const body = {
+          tokenAddress: tokenAddress,
+          targetPrice: targetPrice,
+          respectedToken: respectedToken,
+          pairAddress: pairAddress,
+        };
+
+        // Show loading indicator and hide response container
+        document.getElementById("loadingContainer").style.display = "block";
+        document.getElementById("responseContainer").style.display = "none";
+
+        fetch("https://mypropex.donative.in:3000/bnbWithTokenBot", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.obj.event);
+            // Handle the response data
+            // Hide loading indicator and show response container
+            document.getElementById("loadingContainer").style.display = "none";
+            document.getElementById("responseContainer").style.display =
+              "block";
+            // Set the response value in the separate box
+            document.getElementById("responseValue").textContent =
+              data.obj.event;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
